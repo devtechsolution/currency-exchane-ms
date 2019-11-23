@@ -7,7 +7,6 @@ import java.util.Map;
 import org.as.devtechsolution.bean.CurrencyConversionBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,9 +23,22 @@ public class CurrencyConversionController {
 	@GetMapping("/currency-converter/from/{from}/to/{to}/quantity/{quantity}")
 	public CurrencyConversionBean convertCurrency(@PathVariable String from, @PathVariable String to,
 			@PathVariable BigDecimal quantity) {
+		
+		// Feign - Problem 1
+		Map<String, String> uriVariables = new HashMap<>();
+		uriVariables.put("from", from);
+		uriVariables.put("to", to);
+		
+		ResponseEntity<CurrencyConversionBean> responseEntity = new RestTemplate().getForEntity(
+				"http://localhost:9000/currency-exchange/from/{from}/to/{to}", CurrencyConversionBean.class,
+				uriVariables);
 
-		return new CurrencyConversionBean(1L, from, to, BigDecimal.ONE, quantity,
-				quantity,0);
+		CurrencyConversionBean response = responseEntity.getBody();
+
+		return new CurrencyConversionBean(response.getId(), from, to, response.getConversionMultiple(), quantity,
+				quantity.multiply(response.getConversionMultiple()), response.getPort());
+		
+		
 	}
 
 	
