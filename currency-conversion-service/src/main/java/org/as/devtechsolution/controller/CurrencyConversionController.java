@@ -39,6 +39,7 @@ public class CurrencyConversionController {
 				uriVariables);
 
 		CurrencyConversionBean response = responseEntity.getBody();
+		logger.info("{}"+ response);
 
 		return new CurrencyConversionBean(response.getId(), from, to, response.getConversionMultiple(), quantity,
 				quantity.multiply(response.getConversionMultiple()), response.getPort());
